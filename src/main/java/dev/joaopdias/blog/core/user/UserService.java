@@ -24,7 +24,6 @@ public class UserService {
     public AuthMessage create(CreateUserDto createUserDto) {
         this.throwIfEmailIsUsed(createUserDto.getEmail());
         User user = this.userRepository.save(createUserDto.toEntity());
-        user.removePassword();
         String token = jwtService.generateJwt(user.getEmail());
         return new AuthMessage("Usuário criado com sucesso", user, token);
     }
@@ -33,7 +32,6 @@ public class UserService {
         User user = this.findByEmail(loginUserDto.getEmail());
         if (!loginUserDto.verifyPassword(user.getPassword()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha incorreta");
-        user.removePassword();
         String token = jwtService.generateJwt(user.getEmail());
         return new AuthMessage("Usuário logado com sucesso", user, token);
     }
@@ -41,7 +39,6 @@ public class UserService {
     public User decodeJwt(String jwt) {
         String email = jwtService.decodeJwt(jwt);
         User user = this.findByEmail(email);
-        user.removePassword();
         return user;
     }
 
@@ -59,7 +56,7 @@ public class UserService {
         return new Message("Usuário deletado com sucesso");
     }
 
-    private User findByEmail(String email) {
+    public User findByEmail(String email) {
         User user = this.userRepository.findByEmail(email);
         if (user == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário não encontrado");
