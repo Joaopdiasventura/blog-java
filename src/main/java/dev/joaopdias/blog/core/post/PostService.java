@@ -1,11 +1,14 @@
 package dev.joaopdias.blog.core.post;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import dev.joaopdias.blog.core.post.dto.CreatePostDto;
 import dev.joaopdias.blog.core.post.entities.Post;
@@ -25,6 +28,15 @@ public class PostService {
         Post post = createPostDto.toEntity(userService);
         postRepository.save(post);
         return new Message("Post criado com sucesso");
+    }
+
+    public Post findById(UUID id) {
+        Optional<Post> post = postRepository.findById(id);
+        if (post.isPresent())
+            return post.get();
+        else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado");
+
     }
 
     public List<Post> findByOrder(int page) {

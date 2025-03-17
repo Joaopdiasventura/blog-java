@@ -29,6 +29,11 @@ public class PostController {
         return this.postService.create(createPostDto);
     }
 
+    @GetMapping("{id}")
+    public Post findById(@PathVariable("id") UUID id){
+        return this.postService.findById(id);
+    }
+
     @GetMapping("findByOrder/{page}")
     public List<Post> findByOrder(@PathVariable("page") int page) {
         return this.postService.findByOrder(page < 0 ? 0 : page);
