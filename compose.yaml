@@ -14,6 +14,7 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - JWT_SECRET=blog
+      - ALLOWED_ORIGIN=http://localhost:4200
   db:
     image: postgres:14.17
     restart: always
