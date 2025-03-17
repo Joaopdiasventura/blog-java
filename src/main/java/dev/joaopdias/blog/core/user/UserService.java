@@ -22,49 +22,49 @@ public class UserService {
     private JwtService jwtService;
 
     public AuthMessage create(CreateUserDto createUserDto) {
-        this.throwIfEmailIsUsed(createUserDto.getEmail());
-        User user = this.userRepository.save(createUserDto.toEntity());
+        throwIfEmailIsUsed(createUserDto.getEmail());
+        User user = userRepository.save(createUserDto.toEntity());
         String token = jwtService.generateJwt(user.getEmail());
         return new AuthMessage("Usuário criado com sucesso", user, token);
     }
 
     public AuthMessage login(LoginUserDto loginUserDto) {
-        User user = this.findByEmail(loginUserDto.getEmail());
+        User user = findByEmail(loginUserDto.getEmail());
         if (!loginUserDto.verifyPassword(user.getPassword()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha incorreta");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha incorreta");
         String token = jwtService.generateJwt(user.getEmail());
         return new AuthMessage("Usuário logado com sucesso", user, token);
     }
 
     public User decodeJwt(String jwt) {
         String email = jwtService.decodeJwt(jwt);
-        User user = this.findByEmail(email);
+        User user = findByEmail(email);
         return user;
     }
 
-    public Message update (String email, UpdateUserDto updateUserDto) {
-        this.findByEmail(email);
+    public Message update(String email, UpdateUserDto updateUserDto) {
+        findByEmail(email);
         updateUserDto.setEmail(email);
         User user = updateUserDto.toEntity();
-        this.userRepository.save(user);
+        userRepository.save(user);
         return new Message("Usuário atualizado com sucesso");
     }
 
     public Message delete(String email) {
-        User user = this.findByEmail(email);
-        this.userRepository.delete(user);
+        User user = findByEmail(email);
+        userRepository.delete(user);
         return new Message("Usuário deletado com sucesso");
     }
 
     public User findByEmail(String email) {
-        User user = this.userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         if (user == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário não encontrado");
         return user;
     }
 
     private void throwIfEmailIsUsed(String email) {
-        User user = this.userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         if (user != null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Esse email já está sendo utilizado");
     }
